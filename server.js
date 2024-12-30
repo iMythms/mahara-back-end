@@ -21,5 +21,3 @@ app.use(cors({ origin: 'http://localhost:5173' }))
 app.listen(3000, () => {
   console.log('The express app is ready!')
 })
-
-// npm i
