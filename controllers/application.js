@@ -2,14 +2,7 @@ const Application = require('../models/application')
 
 const GetApplication = async (req, res) => {
   try {
-    const { freelancerId, status } = req.query
-    const clientId = req.user._id
-
-    const query = { clientId }
-    if (freelancerId) query.freelancerId = freelancerId
-    if (status) query.status = status
-
-    const applications = await Application.find(query)
+    const applications = await Application.find({})
 
     res.status(200).json({
       message: 'Applications retrieved successfully.',
@@ -22,7 +15,8 @@ const GetApplication = async (req, res) => {
 
 const CreateApplication = async (req, res) => {
   try {
-    const { freelancerId, message, status } = req.body
+    const { message, status } = req.body
+    const freelancerId = req.params.freelancerId
     const clientId = req.user._id
 
     if (!freelancerId || !message || !status) {
@@ -41,11 +35,11 @@ const CreateApplication = async (req, res) => {
     await newApplication.save()
 
     res.status(201).json({
-      message: 'Application submitted successfully.',
+      message: 'Application submitted successfully',
       application: newApplication
     })
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error.' })
+    res.status(500).json({ error: 'Internal server error' })
   }
 }
 
