@@ -1,6 +1,6 @@
 const Application = require('../models/application')
 
-const GetApplication = async (req, res) => {
+const Get = async (req, res) => {
   try {
     const { applicationId, clientId, freelancerId, status } = req.query
 
@@ -19,7 +19,7 @@ const GetApplication = async (req, res) => {
       if (freelancerId) query.freelancerId = freelancerId
       if (status) query.status = status
 
-      applications = await ApplicationModule.find(query)
+      applications = await Application.find(query)
     }
 
     res.status(200).json({
@@ -39,7 +39,7 @@ const CreateApplication = async (req, res) => {
       return res.status(400).json({ error: 'All fields are required.' })
     }
 
-    const newApplication = new ApplicationModule({
+    const newApplication = new Application({
       clientId,
       freelancerId,
       message,
@@ -91,7 +91,7 @@ const DeleteApplication = async (req, res) => {
       return res.status(400).json({ error: 'Application ID is required.' })
     }
 
-    const deletedApplication = await ApplicationModule.findByIdAndDelete(
+    const deletedApplication = await Application.findByIdAndDelete(
       applicationId
     )
 
@@ -112,5 +112,5 @@ module.exports = {
   GetApplication,
   CreateApplication,
   UpdateApplication,
-  deletedApplication
+  DeleteApplication
 }
