@@ -1,12 +1,7 @@
 const mongoose = require('mongoose')
 
-const JobSchema = new mongoose.Schema(
+const ApplicationSchema = new mongoose.Schema(
 	{
-		applicationId: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Application',
-			required: true,
-		},
 		clientId: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'ClientUser',
@@ -17,18 +12,14 @@ const JobSchema = new mongoose.Schema(
 			ref: 'FreelancerUser',
 			required: true,
 		},
-		title: {
-			type: String,
-			required: true,
-		},
-		description: {
+		message: {
 			type: String,
 			required: true,
 		},
 		status: {
 			type: String,
-			enum: ['todo', 'in_progress', 'complete'],
-			default: 'todo',
+			enum: ['pending', 'approved', 'rejected'],
+			default: 'pending',
 		},
 	},
 	{
@@ -36,6 +27,6 @@ const JobSchema = new mongoose.Schema(
 	}
 )
 
-const Job = mongoose.model('Job', JobSchema)
+const Application = mongoose.model('Application', ApplicationSchema)
 
-module.exports = Job
+module.exports = Application
