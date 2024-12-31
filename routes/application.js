@@ -6,11 +6,13 @@ const {
   DeleteApplication
 } = require('../controllers/application')
 
+const { verifyToken } = require('../middleware/auth')
+
 const router = express.Router()
 
-router.get('/applications', GetApplication)
-router.post('/applications', CreateApplication)
-router.put('/applications/:id', UpdateApplication)
-router.delete('/applications/:id', DeleteApplication)
+router.get('/applications', verifyToken, GetApplication)
+router.post('/applications', verifyToken, CreateApplication)
+router.put('/applications/:id', verifyToken, UpdateApplication)
+router.delete('/applications/:id', verifyToken, DeleteApplication)
 
 module.exports = router

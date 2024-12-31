@@ -1,26 +1,15 @@
 const Application = require('../models/application')
 
-const Get = async (req, res) => {
+const GetApplication = async (req, res) => {
   try {
-    const { applicationId, clientId, freelancerId, status } = req.query
+    const { freelancerId, status } = req.query
+    const clientId = req.user._id
 
-    let applications
+    const query = { clientId }
+    if (freelancerId) query.freelancerId = freelancerId
+    if (status) query.status = status
 
-    if (applicationId) {
-      applications = await Application.findById(applicationId)
-
-      if (!applications) {
-        return res.status(404).json({ error: 'Application not found.' })
-      }
-    } else {
-      const query = {}
-
-      if (clientId) query.clientId = clientId
-      if (freelancerId) query.freelancerId = freelancerId
-      if (status) query.status = status
-
-      applications = await Application.find(query)
-    }
+    const applications = await Application.find(query)
 
     res.status(200).json({
       message: 'Applications retrieved successfully.',
@@ -33,10 +22,13 @@ const Get = async (req, res) => {
 
 const CreateApplication = async (req, res) => {
   try {
-    const { clientId, freelancerId, message, status } = req.body
+    const { freelancerId, message, status } = req.body
+    const clientId = req.user._id
 
-    if (!clientId || !freelancerId || !message || !status) {
-      return res.status(400).json({ error: 'All fields are required.' })
+    if (!freelancerId || !message || !status) {
+      return res
+        .status(400)
+        .json({ error: 'Freelancer ID, message, and status are required.' })
     }
 
     const newApplication = new Application({
@@ -45,10 +37,11 @@ const CreateApplication = async (req, res) => {
       message,
       status
     })
+
     await newApplication.save()
 
     res.status(201).json({
-      message: 'Application Created.',
+      message: 'Application submitted successfully.',
       application: newApplication
     })
   } catch (error) {
@@ -58,24 +51,24 @@ const CreateApplication = async (req, res) => {
 
 const UpdateApplication = async (req, res) => {
   try {
-    const { applicationId, clientId, freelancerId, message, status } = req.body
+    const { id } = req.params
+    const { message, status } = req.body
+    const clientId = req.user._id
 
-    if (!applicationId) {
-      return res.status(400).json({ error: 'Application ID is required.' })
-    }
-
-    const updatedApplication = await Application.findByIdAndUpdate(
-      applicationId,
-      { clientId, freelancerId, message, status },
+    const updatedApplication = await Application.findOneAndUpdate(
+      { _id: id, clientId },
+      { message, status },
       { new: true, runValidators: true }
     )
 
     if (!updatedApplication) {
-      return res.status(404).json({ error: 'Application not found.' })
+      return res
+        .status(404)
+        .json({ error: 'Application not found or unauthorized.' })
     }
 
     res.status(200).json({
-      message: 'Application Updated.',
+      message: 'Application updated successfully.',
       application: updatedApplication
     })
   } catch (error) {
@@ -85,18 +78,18 @@ const UpdateApplication = async (req, res) => {
 
 const DeleteApplication = async (req, res) => {
   try {
-    const { applicationId } = req.body
+    const { id } = req.params
+    const clientId = req.user._id
 
-    if (!applicationId) {
-      return res.status(400).json({ error: 'Application ID is required.' })
-    }
-
-    const deletedApplication = await Application.findByIdAndDelete(
-      applicationId
-    )
+    const deletedApplication = await Application.findOneAndDelete({
+      _id: id,
+      clientId
+    })
 
     if (!deletedApplication) {
-      return res.status(404).json({ error: 'Application not found.' })
+      return res
+        .status(404)
+        .json({ error: 'Application not found or unauthorized.' })
     }
 
     res.status(200).json({
