@@ -1,6 +1,6 @@
-const AdminUser = require('../models/AdminUser')
-const ClientUser = require('../models/ClientUser')
-const FreelancerUser = require('../models/FreelancerUser')
+const AdminUser = require('../models/adminUser')
+const ClientUser = require('../models/clientUser')
+const FreelancerUser = require('../models/freelancerUser')
 
 // Get User Profile
 const getUserProfile = async (req, res) => {

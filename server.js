@@ -6,6 +6,8 @@ const cors = require('cors')
 // Importing Routes
 const authRouter = require('./routes/auth')
 const userRouter = require('./routes/user')
+const wishlistRouter = require('./routes/wishlist')
+const applicationRouter = require('./routes/applications')
 
 // Middleware
 const { verifyToken } = require('./middleware/jwtUtils')
@@ -31,6 +33,8 @@ app.use(
 // Routes go here
 app.use('/auth', authRouter)
 app.use('/user', verifyToken, userRouter)
+app.use('/wishlist', verifyToken, wishlistRouter)
+app.use('/applications', verifyToken, applicationRouter)
 
 app.listen(PORT, () => {
 	console.log(`Running on http://localhost:${PORT}`)
