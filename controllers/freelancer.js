@@ -25,17 +25,7 @@ const findAppFreelancer = async (req, res) => {
   }
 }
 
-// // Get all categories for the logged-in freelancer
-// const getCategoriesForFreelancer = async (req, res) => {
-//   try {
-//     const freelancerId = req.user._id
-
-//     // Fetch all categories for the freelancer
-//     const categories = await categories
-//       .find({ freelancerId })
-//       .populate('categories')
-//     res.status(200).json(applications)
-//   } catch (error) {
-//     res.status(500).json({ error: 'Internal server error.' })
-//   }
-// }
+module.exports = {
+  index,
+  findAppFreelancer
+}
