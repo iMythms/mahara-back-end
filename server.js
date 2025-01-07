@@ -8,6 +8,9 @@ const authRouter = require('./routes/auth')
 const userRouter = require('./routes/user')
 const wishlistRouter = require('./routes/wishlist')
 const applicationRouter = require('./routes/applications')
+const jobsRouter = require('./routes/jobs')
+const galleryRouter = require('./routes/gallery')
+const contactUsRouter = require('./routes/contactUs')
 
 // Middleware
 const { verifyToken } = require('./middleware/jwtUtils')
@@ -35,6 +38,9 @@ app.use('/auth', authRouter)
 app.use('/user', verifyToken, userRouter)
 app.use('/wishlist', verifyToken, wishlistRouter)
 app.use('/applications', verifyToken, applicationRouter)
+app.use('/jobs', verifyToken, jobsRouter)
+app.use('/gallery', verifyToken, galleryRouter)
+app.use('/contactUs', contactUsRouter)
 
 app.listen(PORT, () => {
 	console.log(`Running on http://localhost:${PORT}`)
