@@ -30,7 +30,7 @@ const FreelancerUserSchema = new mongoose.Schema(
     averageRating: {
       type: Number,
       default: 0,
-      min: 1,
+      min: 0,
       max: 5
     }
   },

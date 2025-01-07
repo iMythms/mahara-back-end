@@ -11,6 +11,9 @@ const createApplication = async (req, res) => {
     // Check if the freelancer exists
     const freelancer = await FreelancerUser.findById(freelancerId)
     if (!freelancer) {
+      console.error(error)
+      console.log(error)
+
       return res.status(404).json({ error: 'Freelancer not found.' })
     }
 
