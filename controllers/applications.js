@@ -17,7 +17,7 @@ const createApplication = async (req, res) => {
       return res.status(404).json({ error: 'Freelancer not found.' })
     }
 
-    // Create a new application
+    // Create A new application
     const newApplication = new Application({
       clientId,
       freelancerId,
