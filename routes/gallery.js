@@ -7,10 +7,10 @@ const {
 const router = express.Router()
 
 // Add a new project to the gallery
-router.post('/', addGalleryProject)
+router.post('/new', addGalleryProject)
 
 // Get all gallery projects for the logged-in freelancer
-router.get('/', getGalleryProject)
+router.get('/list', getGalleryProject)
 
 // Delete a project from the gallery
 router.delete('/:projectId', deleteGalleryProject)

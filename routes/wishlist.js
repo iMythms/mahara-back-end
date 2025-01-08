@@ -7,7 +7,9 @@ const {
 const router = express.Router()
 
 router.post('/', addToWishlist)
+
 router.delete('/:freelancerId', removeFromWishlist)
+
 router.get('/', getWishlist)
 
 module.exports = router
