@@ -1,8 +1,8 @@
 const express = require('express')
 const {
-	createApplication,
-	getApplicationsForFreelancer,
-	updateApplicationStatus,
+  createApplication,
+  getApplicationsForFreelancer,
+  updateApplicationStatus
 } = require('../controllers/applications')
 const router = express.Router()
 
