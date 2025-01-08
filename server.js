@@ -1,4 +1,4 @@
-const dotenv = require('dotenv')
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const cors = require('cors')
@@ -11,11 +11,12 @@ const applicationRouter = require('./routes/applications')
 const jobsRouter = require('./routes/jobs')
 const galleryRouter = require('./routes/gallery')
 const contactUsRouter = require('./routes/contactUs')
+const emailTestRouter = require('./routes/emailTest')
 
 // Middleware
 const { verifyToken } = require('./middleware/jwtUtils')
 
-dotenv.config()
+// dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT
@@ -41,6 +42,14 @@ app.use('/applications', verifyToken, applicationRouter)
 app.use('/jobs', verifyToken, jobsRouter)
 app.use('/gallery', verifyToken, galleryRouter)
 app.use('/contactUs', contactUsRouter)
+
+// Test email notification route
+app.use('/email-test', emailTestRouter)
+
+// Routes not found
+// app.use((req, res, next) => {
+// 	res.status(404).json({ error: 'Route not found' })
+// })
 
 app.listen(PORT, () => {
 	console.log(`Running on http://localhost:${PORT}`)

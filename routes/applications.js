@@ -7,10 +7,10 @@ const {
 const router = express.Router()
 
 // Create a new application
-router.post('/', createApplication)
+router.post('/new', createApplication)
 
 // Get applications for the logged-in freelancer
-router.get('/', getApplicationsForFreelancer)
+router.get('/list', getApplicationsForFreelancer)
 
 // Update application status (approve/reject)
 router.put('/:applicationId', updateApplicationStatus)

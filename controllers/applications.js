@@ -1,6 +1,6 @@
-const { application } = require('express')
 const Application = require('../models/application')
 const FreelancerUser = require('../models/freelancerUser')
+const { sendEmail } = require('../middleware/emailUtils')
 
 // Create a new application (client request to freelancer)
 const createApplication = async (req, res) => {
@@ -24,11 +24,19 @@ const createApplication = async (req, res) => {
 
 		await newApplication.save()
 
+		// Send email notification to the freelancer
+		const subject = 'New Application Received'
+		const text = `You have received a new application from a client. Here is the message: \n\n${message}`
+		const html = `<p>You have received a new application from a client.</p><p>Message:</p><p>${message}</p>`
+
+		await sendEmail(freelancer.email, subject, text, html)
+
 		res.status(201).json({
-			message: 'Application created successfully.',
+			message: 'Application created successfully and email sent to freelancer.',
 			application: newApplication,
 		})
 	} catch (error) {
+		console.error(`Error in createApplication: ${error.message}`)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }
