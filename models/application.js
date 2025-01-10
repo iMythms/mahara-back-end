@@ -12,6 +12,10 @@ const ApplicationSchema = new mongoose.Schema(
 			ref: 'FreelancerUser',
 			required: true,
 		},
+		title: {
+			type: String,
+			required: true,
+		},
 		message: {
 			type: String,
 			required: true,

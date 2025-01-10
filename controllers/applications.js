@@ -1,4 +1,5 @@
 const Application = require('../models/application')
+const Job = require('../models/jobs')
 const FreelancerUser = require('../models/freelancerUser')
 const { sendEmail } = require('../middleware/emailUtils')
 
@@ -6,7 +7,7 @@ const { sendEmail } = require('../middleware/emailUtils')
 const createApplication = async (req, res) => {
 	try {
 		const clientId = req.user._id
-		const { freelancerId, message } = req.body
+		const { freelancerId, title, message } = req.body
 
 		// Check if the freelancer exists
 		const freelancer = await FreelancerUser.findById(freelancerId)
@@ -18,6 +19,7 @@ const createApplication = async (req, res) => {
 		const newApplication = new Application({
 			clientId,
 			freelancerId,
+			title,
 			message,
 			status: 'pending',
 		})
@@ -25,7 +27,7 @@ const createApplication = async (req, res) => {
 		await newApplication.save()
 
 		// Send email notification to the freelancer
-		const subject = 'New Application Received'
+		const subject = `New Application Received: ${title}`
 		const text = `You have received a new application from a client. Here is the message: \n\n${message}`
 		const html = `<p>You have received a new application from a client.</p><p>Message:</p><p>${message}</p>`
 
@@ -45,14 +47,23 @@ const createApplication = async (req, res) => {
 const getApplicationsForFreelancer = async (req, res) => {
 	try {
 		const freelancerId = req.user._id
+		const { status } = req.query // Extract the status query parameter
 
-		// Fetch all applications for the freelancer
-		const applications = await Application.find({ freelancerId }).populate(
+		// Build the query filter
+		const filter = { freelancerId } // Base filter
+		if (status) {
+			filter.status = status // Add status to the filter if provided
+		}
+
+		// Fetch applications with optional filtering by status
+		const applications = await Application.find(filter).populate(
 			'clientId',
 			'name email profilePicture'
 		)
+
 		res.status(200).json(applications)
 	} catch (error) {
+		console.error(`Error fetching applications: ${error.message}`)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }
@@ -82,8 +93,33 @@ const updateApplicationStatus = async (req, res) => {
 				.json({ error: 'Application not found or not authorized.' })
 		}
 
+		// If approved, create a job
+		if (status === 'approved') {
+			// Check if a job already exists for this application
+			const existingJob = await Job.findOne({ applicationId })
+			if (existingJob) {
+				return res
+					.status(400)
+					.json({ error: 'Job already exists for this application.' })
+			}
+
+			// Create a new job
+			const newJob = new Job({
+				applicationId,
+				clientId: application.clientId,
+				freelancerId: application.freelancerId,
+				title: application.title,
+				description: application.message, // Use application message as the job description
+				status: 'todo', // Default status
+			})
+
+			await newJob.save()
+			console.log('Job created successfully:', newJob)
+		}
+
 		res.status(200).json({ message: `Application ${status}`, application })
 	} catch (error) {
+		console.error(`Error in updateApplicationStatus: ${error.message}`)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }
