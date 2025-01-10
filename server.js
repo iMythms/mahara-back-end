@@ -16,8 +16,6 @@ const emailTestRouter = require('./routes/emailTest')
 // Middleware
 const { verifyToken } = require('./middleware/jwtUtils')
 
-// dotenv.config()
-
 const app = express()
 const PORT = process.env.PORT
 

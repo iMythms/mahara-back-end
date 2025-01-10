@@ -41,6 +41,27 @@ const createJob = async (req, res) => {
 	}
 }
 
+// Get all jobs (Admin access)
+const getAllJobs = async (req, res) => {
+	try {
+		// Ensure only admin can access
+		if (req.user.roleType !== 'admin') {
+			return res.status(403).json({ error: 'Access denied.' })
+		}
+
+		// Fetch all jobs
+		const jobs = await Job.find()
+			.populate('clientId', 'name email')
+			.populate('freelancerId', 'name email')
+			.populate('applicationId', 'message status')
+
+		res.status(200).json(jobs)
+	} catch (error) {
+		console.error(`Error fetching all jobs: ${error.message}`)
+		res.status(500).json({ error: 'Internal server error.' })
+	}
+}
+
 // Get all jobs for the logged-in user (client or freelancer)
 const getJobs = async (req, res) => {
 	try {
@@ -95,6 +116,7 @@ const updateJobStatus = async (req, res) => {
 
 module.exports = {
 	createJob,
+	getAllJobs,
 	getJobs,
 	updateJobStatus,
 }

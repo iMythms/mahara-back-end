@@ -43,6 +43,26 @@ const createApplication = async (req, res) => {
 	}
 }
 
+// Get all applications (Admin access)
+const getAllApplications = async (req, res) => {
+	try {
+		// Ensure only admin can access
+		if (req.user.roleType !== 'admin') {
+			return res.status(403).json({ error: 'Access denied.' })
+		}
+
+		// Fetch all applications
+		const applications = await Application.find()
+			.populate('clientId', 'name email profilePicture')
+			.populate('freelancerId', 'name email profilePicture')
+
+		res.status(200).json(applications)
+	} catch (error) {
+		console.error(`Error fetching all applications: ${error.message}`)
+		res.status(500).json({ error: 'Internal server error.' })
+	}
+}
+
 // Get all application for the logged-in freelancer
 const getApplicationsForFreelancer = async (req, res) => {
 	try {
@@ -64,6 +84,22 @@ const getApplicationsForFreelancer = async (req, res) => {
 		res.status(200).json(applications)
 	} catch (error) {
 		console.error(`Error fetching applications: ${error.message}`)
+		res.status(500).json({ error: 'Internal server error.' })
+	}
+}
+
+// Get all applications for the logged-in client
+const getApplicationsForClient = async (req, res) => {
+	try {
+		const clientId = req.user._id // Get the client ID from the authenticated user
+		const applications = await Application.find({ clientId }).populate(
+			'freelancerId',
+			'name email profilePicture'
+		)
+
+		res.status(200).json(applications)
+	} catch (error) {
+		console.error(`Error fetching applications for client: ${error.message}`)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }
@@ -126,6 +162,8 @@ const updateApplicationStatus = async (req, res) => {
 
 module.exports = {
 	createApplication,
+	getAllApplications,
 	getApplicationsForFreelancer,
+	getApplicationsForClient,
 	updateApplicationStatus,
 }

@@ -1,9 +1,17 @@
 const express = require('express')
-const { createJob, getJobs, updateJobStatus } = require('../controllers/jobs')
+const {
+	createJob,
+	getAllJobs,
+	getJobs,
+	updateJobStatus,
+} = require('../controllers/jobs')
 const router = express.Router()
 
 // Create a new job
 router.post('/new', createJob)
+
+// Get all jobs (admin only)
+router.get('/list/admin', getAllJobs)
 
 // Get jobs for the logged-in user
 router.get('/list', getJobs)
