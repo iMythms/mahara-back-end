@@ -19,6 +19,11 @@ const FreelancerUserSchema = new mongoose.Schema(
 			type: String,
 			default: null,
 		},
+		roleType: {
+			type: String,
+			required: true,
+			default: 'freelancer',
+		},
 		categories: {
 			type: [String],
 			default: [],

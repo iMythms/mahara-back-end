@@ -19,6 +19,11 @@ const ClientUserSchema = new mongoose.Schema(
 			type: String,
 			default: null,
 		},
+		roleType: {
+			type: String,
+			required: true,
+			default: 'client',
+		},
 	},
 	{
 		timestamps: true,
