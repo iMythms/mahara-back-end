@@ -1,8 +1,8 @@
 const express = require('express')
 const {
-	addToWishlist,
-	removeFromWishlist,
-	getWishlist,
+  addToWishlist,
+  removeFromWishlist,
+  getWishlist
 } = require('../controllers/wishlist')
 const router = express.Router()
 
