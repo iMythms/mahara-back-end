@@ -1,13 +1,19 @@
 const Gallery = require('../models/gallery')
+const multer = require('multer')
+const { storage } = require('../config/cloudinary')
+const upload = multer({ storage })
 
 // Add a project to the gallery
 const addGalleryProject = async (req, res) => {
 	try {
 		const freelancerId = req.user._id
-		const { projectName, description, images } = req.body
+		const { projectName, description } = req.body
 
-		// Validate that a maximum of 5 images are uploaded
-		if (images && images.length > 5) {
+		// Get image URLs from uploaded files
+		const images = req.files.map((file) => file.path)
+
+		// Validate the number of uploaded images
+		if (images.length > 5) {
 			return res
 				.status(400)
 				.json({ error: 'A maximum of 5 images is allowed.' })
@@ -18,7 +24,7 @@ const addGalleryProject = async (req, res) => {
 			freelancerId,
 			projectName,
 			description,
-			images,
+			images, // Store image URLs
 		})
 		await newProject.save()
 
@@ -27,6 +33,7 @@ const addGalleryProject = async (req, res) => {
 			project: newProject,
 		})
 	} catch (error) {
+		console.error('Error adding gallery project:', error)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }
@@ -41,6 +48,28 @@ const getGalleryProject = async (req, res) => {
 
 		res.status(200).json(projects)
 	} catch (error) {
+		res.status(500).json({ error: 'Internal server error.' })
+	}
+}
+
+// Fetch all gallery projects for a specific freelancer
+const getGalleryProjectsForFreelancer = async (req, res) => {
+	try {
+		const { freelancerId } = req.params // Extract freelancer ID from route parameters
+
+		// Find projects associated with the freelancer ID
+		const projects = await Gallery.find({ freelancerId })
+
+		// Handle case when no projects are found
+		if (!projects || projects.length === 0) {
+			return res
+				.status(404)
+				.json({ error: 'No projects found for this freelancer.' })
+		}
+
+		res.status(200).json(projects)
+	} catch (error) {
+		console.error('Error fetching gallery projects:', error)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }
@@ -71,5 +100,6 @@ const deleteGalleryProject = async (req, res) => {
 module.exports = {
 	addGalleryProject,
 	getGalleryProject,
+	getGalleryProjectsForFreelancer,
 	deleteGalleryProject,
 }
