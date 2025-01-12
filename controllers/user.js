@@ -19,10 +19,9 @@ const getFreelancersByCategory = async (req, res) => {
 // Get User Profile
 const getUserProfile = async (req, res) => {
 	try {
-		// The user ID and role are available in req.user (set by verifyToken)
 		const { _id, role } = req.user
 
-		// Determine which user model to use based on the role
+		// Determine the user model based on the role
 		let UserModel
 		switch (role) {
 			case 'admin':
@@ -39,13 +38,19 @@ const getUserProfile = async (req, res) => {
 		}
 
 		// Find the user by ID
-		const user = await UserModel.findById(_id).select('-password') // Exclude password from response
+		const user = await UserModel.findById(_id).select('-password') // Exclude password
 		if (!user) {
 			return res.status(404).json({ error: 'User not found.' })
 		}
 
+		// Ensure `categories` is always an array
+		if (user.categories && typeof user.categories === 'string') {
+			user.categories = user.categories.split(',') // Split string into an array
+		}
+
 		res.status(200).json({ user })
 	} catch (error) {
+		console.error('Error fetching user profile:', error)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }
@@ -71,7 +76,7 @@ const updateUserProfile = async (req, res) => {
 	try {
 		const { _id, role } = req.user
 
-		// Determine which user model to use based on the role
+		// Determine the user model based on the role
 		let UserModel
 		switch (role) {
 			case 'admin':
@@ -87,12 +92,24 @@ const updateUserProfile = async (req, res) => {
 				return res.status(400).json({ error: 'Invalid user role.' })
 		}
 
-		// Find and update the user by ID
-		const updatedUser = await UserModel.findByIdAndUpdate(
-			_id,
-			{ ...req.body }, // Update fields from the request body
-			{ new: true, runValidators: true } // Return the updated document
-		).select('-password') // Exclude password from response
+		// Prepare the update object
+		const updateData = { ...req.body }
+
+		// Parse `categories` if it's a string
+		if (updateData.categories && typeof updateData.categories === 'string') {
+			updateData.categories = JSON.parse(updateData.categories) // Parse JSON string
+		}
+
+		// Handle profile picture if uploaded
+		if (req.file) {
+			updateData.profilePicture = req.file.path
+		}
+
+		// Update the user
+		const updatedUser = await UserModel.findByIdAndUpdate(_id, updateData, {
+			new: true,
+			runValidators: true,
+		}).select('-password')
 
 		if (!updatedUser) {
 			return res.status(404).json({ error: 'User not found.' })
@@ -103,6 +120,7 @@ const updateUserProfile = async (req, res) => {
 			user: updatedUser,
 		})
 	} catch (error) {
+		console.error('Error updating profile:', error)
 		res.status(500).json({ error: 'Internal server error.' })
 	}
 }

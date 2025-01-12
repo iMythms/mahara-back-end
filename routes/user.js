@@ -6,6 +6,9 @@ const {
 	getFreelancerById,
 } = require('../controllers/user')
 const { verifyToken } = require('../middleware/jwtUtils')
+const multer = require('multer')
+const { storage } = require('../config/cloudinary') // Assuming Cloudinary or similar
+const upload = multer({ storage })
 
 const router = express.Router()
 
@@ -18,6 +21,11 @@ router.get('/profile', verifyToken, getUserProfile)
 router.get('/freelancers/:id', getFreelancerById)
 
 // Update the profile of the logged-in user
-router.put('/update', verifyToken, updateUserProfile)
+router.put(
+	'/update',
+	verifyToken,
+	upload.single('profilePicture'),
+	updateUserProfile
+)
 
 module.exports = router
