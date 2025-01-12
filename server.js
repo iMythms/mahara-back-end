@@ -28,7 +28,9 @@ mongoose.connection.on('connected', () => {
 app.use(express.json())
 app.use(
 	cors({
-		origin: 'http://localhost:5173', // Frontend port
+		origin: process.env.FRONT_END_URL,
+		methods: ['GET', 'POST', 'PUT', 'DELETE'],
+		credentials: true,
 	})
 )
 
